@@ -31,7 +31,7 @@ options.add_argument('--enable-javascript')
 
 
 def modified_url(link, name, folder):
-    with open(os.path.join(folder, 'data/city_params.json'), 'r') as doc:
+    with open(os.path.join(folder, 'city_params.json'), 'r') as doc:
         params = json.load(doc)
         for param in params:
             if name == param['name']:
@@ -40,12 +40,32 @@ def modified_url(link, name, folder):
     return modified_link
 
 
-def get_and_modified_data(url, c_name, folder):
+def to_excel(profile, url):
+    table_name = url.split('/')
+    result_table = os.path.join(data_folder, f'{"_".join(table_name[2:5])}.xlsx')
+
+    df = pd.DataFrame.from_dict(profile, orient='index')
+    df = df.transpose()
+
+    if os.path.isfile(result_table):
+        workbook = openpyxl.load_workbook(result_table)
+        sheet = workbook['result']
+
+        for row in dataframe_to_rows(df, header=False, index=False):
+            sheet.append(row)
+        workbook.save(result_table)
+        workbook.close()
+    else:
+        with pd.ExcelWriter(path=result_table, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='result')
+
+
+def get_and_modified_data(url, c_name, doc_folder):
     service = Service(f'{os.getcwd()}/chromedriver')
     driver = undetected_chromedriver.Chrome(service=service, options=options)
     timeout = 3
 
-    mod_url = modified_url(link=url, name=c_name, folder=folder)
+    mod_url = modified_url(link=url, name=c_name, folder=doc_folder)
 
     result_dict = dict()
     print(mod_url)
@@ -73,7 +93,7 @@ def get_and_modified_data(url, c_name, folder):
 
         for page in range(1, pages + 1):
             print(f'Scan page №{page_count}...')
-            mod_url = modified_url(link=url, name=c_name) + f'&p={page}'
+            mod_url = modified_url(link=url, name=c_name, folder=doc_folder) + f'&p={page}'
             print(mod_url)
             driver.get(mod_url)
             time.sleep(1)
@@ -144,23 +164,25 @@ def get_and_modified_data(url, c_name, folder):
                     result_dict['Услуга'] = profile_service
                     result_dict['Цена'] = profile_value
 
-                    table_name = mod_url.split('/')
-                    result_table = os.path.join(data_folder, f'{"_".join(table_name[2:5])}.xlsx')
+                    to_excel(profile=result_dict, url=mod_url)
 
-                    df = pd.DataFrame.from_dict(result_dict, orient='index')
-                    df = df.transpose()
-
-                    if os.path.isfile(result_table):
-                        workbook = openpyxl.load_workbook(result_table)
-                        sheet = workbook['result']
-
-                        for row in dataframe_to_rows(df, header=False, index=False):
-                            sheet.append(row)
-                        workbook.save(result_table)
-                        workbook.close()
-                    else:
-                        with pd.ExcelWriter(path=result_table, engine='openpyxl') as writer:
-                            df.to_excel(writer, index=False, sheet_name='result')
+                    # table_name = mod_url.split('/')
+                    # result_table = os.path.join(data_folder, f'{"_".join(table_name[2:5])}.xlsx')
+                    #
+                    # df = pd.DataFrame.from_dict(result_dict, orient='index')
+                    # df = df.transpose()
+                    #
+                    # if os.path.isfile(result_table):
+                    #     workbook = openpyxl.load_workbook(result_table)
+                    #     sheet = workbook['result']
+                    #
+                    #     for row in dataframe_to_rows(df, header=False, index=False):
+                    #         sheet.append(row)
+                    #     workbook.save(result_table)
+                    #     workbook.close()
+                    # else:
+                    #     with pd.ExcelWriter(path=result_table, engine='openpyxl') as writer:
+                    #         df.to_excel(writer, index=False, sheet_name='result')
 
                 profile_count += 1
                 time.sleep(1)
@@ -176,7 +198,7 @@ def get_and_modified_data(url, c_name, folder):
 def main():
     enter_c_name = str(input('Enter the name of the city:\n> '))
     enter_url = str(input('Enter url:\n> '))
-    get_and_modified_data(url=enter_url, c_name=enter_c_name, folder=data_folder)
+    get_and_modified_data(url=enter_url, c_name=enter_c_name, doc_folder=data_folder)
 
 
 if __name__ == '__main__':
