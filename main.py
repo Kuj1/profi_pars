@@ -90,7 +90,7 @@ def get_and_modified_data(url, c_name, doc_folder):
     mod_url = modified_url(link=url, name=c_name, folder=doc_folder)
 
     result_dict = dict()
-    print(mod_url)
+    print(f'url: {mod_url}')
 
     try:
         driver.get(mod_url)
@@ -100,7 +100,6 @@ def get_and_modified_data(url, c_name, doc_folder):
         count_specialist = int(soup.find_all('li', class_='ui_1PoLy')[2].
                                find('span', class_='ui_1TyQ_').
                                find('span').text.strip())
-        print(count_specialist)
         count_pages = count_specialist / 20
 
         if count_pages >= 100:
@@ -114,9 +113,8 @@ def get_and_modified_data(url, c_name, doc_folder):
         page_count = 1
 
         for page in range(1, pages + 1):
-            print(f'Scan page №{page_count}...')
+            print(f'Scan page {page_count} / {pages}')
             mod_url = modified_url(link=url, name=c_name, folder=doc_folder) + f'&p={page}'
-            print(mod_url)
             driver.get(mod_url)
             time.sleep(1)
 
@@ -130,7 +128,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                 links_profile.append(link_profile)
 
             for link in links_profile:
-                print(f'Scan profile №{profile_count}...')
+                print(f'Scan profile {profile_count} / {count_specialist}')
                 driver.get(link)
                 time.sleep(1)
 
@@ -141,8 +139,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                     if descript_price:
                         descript_price.click()
                 except Exception as ex:
-                    # del ex
-                    print(ex)
+                    del ex
 
                 profile_soup = BeautifulSoup(driver.page_source, 'lxml')
 
