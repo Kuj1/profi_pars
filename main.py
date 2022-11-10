@@ -1,6 +1,8 @@
 import os
 import time
 import json
+import concurrent.futures
+from multiprocessing import cpu_count
 
 import pandas as pd
 import openpyxl
@@ -17,10 +19,14 @@ from bs4 import BeautifulSoup
 
 UA = UserAgent(verify_ssl=False)
 
-data_folder = os.path.join(os.getcwd(), 'data')
+data_folder = os.path.join(os.getcwd(), 'result_data')
+user_folder = os.path.join(os.getcwd(), 'user_data')
 
 if not os.path.exists(data_folder):
     os.mkdir(data_folder)
+
+if not os.path.exists(user_folder):
+    os.mkdir(user_folder)
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-blink-features=AutomationControlled')
@@ -28,6 +34,16 @@ options.add_argument(f'--user-agent={UA.chrome}')
 options.add_argument('start-maximized')
 options.add_argument('--headless')
 options.add_argument('--enable-javascript')
+
+
+def exec_url(u_folder):
+    params_url = dict()
+    with open(os.path.join(u_folder, 'user_urls.txt'), 'r') as doc:
+        for url in doc.readlines():
+            params = url.replace('\n', '').strip().split(';')
+            params_url[params[0]] = params[1]
+
+    return params_url
 
 
 def modified_url(link, name, folder):
@@ -43,13 +59,14 @@ def modified_url(link, name, folder):
 def to_excel(profile, url):
     table_name = url.split('/')
     result_table = os.path.join(data_folder, f'{"_".join(table_name[2:5])}.xlsx')
+    name_of_sheet = "_".join(table_name[3:5])
 
     df = pd.DataFrame.from_dict(profile, orient='index')
     df = df.transpose()
 
     if os.path.isfile(result_table):
         workbook = openpyxl.load_workbook(result_table)
-        sheet = workbook['result']
+        sheet = workbook[f'{name_of_sheet}']
 
         for row in dataframe_to_rows(df, header=False, index=False):
             sheet.append(row)
@@ -57,7 +74,7 @@ def to_excel(profile, url):
         workbook.close()
     else:
         with pd.ExcelWriter(path=result_table, engine='openpyxl') as writer:
-            df.to_excel(writer, index=False, sheet_name='result')
+            df.to_excel(writer, index=False, sheet_name=f'{name_of_sheet}')
 
 
 def get_and_modified_data(url, c_name, doc_folder):
@@ -166,24 +183,6 @@ def get_and_modified_data(url, c_name, doc_folder):
 
                     to_excel(profile=result_dict, url=mod_url)
 
-                    # table_name = mod_url.split('/')
-                    # result_table = os.path.join(data_folder, f'{"_".join(table_name[2:5])}.xlsx')
-                    #
-                    # df = pd.DataFrame.from_dict(result_dict, orient='index')
-                    # df = df.transpose()
-                    #
-                    # if os.path.isfile(result_table):
-                    #     workbook = openpyxl.load_workbook(result_table)
-                    #     sheet = workbook['result']
-                    #
-                    #     for row in dataframe_to_rows(df, header=False, index=False):
-                    #         sheet.append(row)
-                    #     workbook.save(result_table)
-                    #     workbook.close()
-                    # else:
-                    #     with pd.ExcelWriter(path=result_table, engine='openpyxl') as writer:
-                    #         df.to_excel(writer, index=False, sheet_name='result')
-
                 profile_count += 1
                 time.sleep(1)
             page_count += 1
@@ -195,10 +194,28 @@ def get_and_modified_data(url, c_name, doc_folder):
         driver.quit()
 
 
+def concentrate_func(url, doc_folder, c_name):
+    get_and_modified_data(url=url, c_name=c_name, doc_folder=doc_folder)
+
+
 def main():
-    enter_c_name = str(input('Enter the name of the city:\n> '))
-    enter_url = str(input('Enter url:\n> '))
-    get_and_modified_data(url=enter_url, c_name=enter_c_name, doc_folder=data_folder)
+    workers = cpu_count()
+
+    futures = []
+    length_data = len(exec_url(u_folder=user_folder))
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
+        for url, city_name in exec_url(u_folder=user_folder).items():
+            new_future = executor.submit(
+                concentrate_func,
+                url=url,
+                doc_folder=user_folder,
+                c_name=city_name
+            )
+            futures.append(new_future)
+            length_data -= 1
+
+    concurrent.futures.wait(futures)
 
 
 if __name__ == '__main__':
