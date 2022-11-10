@@ -2,6 +2,7 @@ import os
 import time
 import json
 import concurrent.futures
+import shutil
 from multiprocessing import cpu_count
 
 import pandas as pd
@@ -21,12 +22,16 @@ UA = UserAgent(verify_ssl=False)
 
 data_folder = os.path.join(os.getcwd(), 'result_data')
 user_folder = os.path.join(os.getcwd(), 'user_data')
+html_folder = os.path.join(os.getcwd(), 'html_data')
 
 if not os.path.exists(data_folder):
     os.mkdir(data_folder)
 
 if not os.path.exists(user_folder):
     os.mkdir(user_folder)
+
+if not os.path.exists(html_folder):
+    os.mkdir(html_folder)
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-blink-features=AutomationControlled')
@@ -141,7 +146,7 @@ def get_and_modified_data(url, c_name, doc_folder):
 
                 profile_soup = BeautifulSoup(driver.page_source, 'lxml')
 
-                with open(f'{os.path.join(data_folder, f"{c_name}.html")}', 'w') as file:
+                with open(f'{os.path.join(html_folder, f"{c_name}.html")}', 'w') as file:
                     file.write(driver.page_source)
 
                 profile_name = profile_soup.find('h1', attrs={'data-shmid': 'profilePrepName'}).text.strip()
@@ -159,7 +164,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                 profile_service = list()
                 profile_value = list()
                 profile_ext = list()
-                with open(f'{os.path.join(data_folder, f"{c_name}.html")}', 'r') as file:
+                with open(f'{os.path.join(html_folder, f"{c_name}.html")}', 'r') as file:
                     src = file.read()
 
                     n_u = BeautifulSoup(src, 'lxml')
@@ -219,4 +224,8 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+        shutil.rmtree(html_folder)
+    except KeyboardInterrupt:
+        shutil.rmtree(html_folder)
