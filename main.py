@@ -14,11 +14,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from fake_useragent import UserAgent
 from bs4 import BeautifulSoup
 
-
-UA = UserAgent(verify_ssl=False)
 
 data_folder = os.path.join(os.getcwd(), 'result_data')
 user_folder = os.path.join(os.getcwd(), 'user_data')
@@ -33,9 +30,11 @@ if not os.path.exists(user_folder):
 if not os.path.exists(html_folder):
     os.mkdir(html_folder)
 
+ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-blink-features=AutomationControlled')
-options.add_argument(f'--user-agent={UA.chrome}')
+options.add_argument(f'--user-agent={ua}')
 options.add_argument('start-maximized')
 options.add_argument('--headless')
 options.add_argument('--enable-javascript')
