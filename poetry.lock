@@ -85,14 +85,6 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "fake-useragent"
-version = "0.1.14"
-description = "Up-to-date simple useragent faker with real world database"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "h11"
 version = "0.14.0"
 description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
@@ -348,7 +340,7 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.11"
-content-hash = "da36fc6bca4a208f7cf6bcfe4e431053cc09373debcda2ef7142bcc796ec2e1a"
+content-hash = "72d63764becf924cfa8c75d488eca4e06b3b153e0561c36ad11c3407dedb66ac"
 
 [metadata.files]
 async-generator = [
@@ -443,10 +435,6 @@ charset-normalizer = [
 et-xmlfile = [
     {file = "et_xmlfile-1.1.0-py3-none-any.whl", hash = "sha256:a2ba85d1d6a74ef63837eed693bcb89c3f752169b0e3e7ae5b16ca5e1b3deada"},
     {file = "et_xmlfile-1.1.0.tar.gz", hash = "sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c"},
-]
-fake-useragent = [
-    {file = "fake-useragent-0.1.14.tar.gz", hash = "sha256:470c509fc645a4fb2799a6cdf35982c3d27e57af04f601b3f37ac0b5e46c0cc7"},
-    {file = "fake_useragent-0.1.14-py3-none-any.whl", hash = "sha256:f51e7c58e3733be152f69e2d0751d19274f0d36dd7a75e6706e503163bc61d46"},
 ]
 h11 = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
