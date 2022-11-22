@@ -94,7 +94,7 @@ def get_and_modified_data(url, c_name, doc_folder):
     try:
         driver.get(mod_url)
         time.sleep(1)
-        soup = BeautifulSoup(driver.page_source, 'lxml')
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         count_specialist = int(soup.find_all('li', class_='ui_1PoLy')[2].
                                find('span', class_='ui_1TyQ_').
@@ -117,7 +117,7 @@ def get_and_modified_data(url, c_name, doc_folder):
             driver.get(mod_url)
             time.sleep(1)
 
-            spec_soup = BeautifulSoup(driver.page_source, 'lxml')
+            spec_soup = BeautifulSoup(driver.page_source, 'html.parser')
 
             links_profile = list()
 
@@ -140,7 +140,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                 except Exception as ex:
                     del ex
 
-                profile_soup = BeautifulSoup(driver.page_source, 'lxml')
+                profile_soup = BeautifulSoup(driver.page_source, 'html.parser')
 
                 with open(f'{os.path.join(html_folder, f"{c_name}.html")}', 'w') as file:
                     file.write(driver.page_source)
@@ -163,7 +163,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                 with open(f'{os.path.join(html_folder, f"{c_name}.html")}', 'r') as file:
                     src = file.read()
 
-                    n_u = BeautifulSoup(src, 'lxml')
+                    n_u = BeautifulSoup(src, 'html.parser')
 
                     profile_price = n_u.find_all('table', class_='price-list desktop-profile__prices')[1].\
                         find_all('tr', attrs={'data-shmid': 'priceRow'})
