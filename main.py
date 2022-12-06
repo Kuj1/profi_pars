@@ -38,6 +38,7 @@ options.add_argument(f'--user-agent={ua}')
 options.add_argument('start-maximized')
 options.add_argument('--headless')
 options.add_argument('--enable-javascript')
+options.binary_location = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 
 
 def exec_url(u_folder):
