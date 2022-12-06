@@ -180,7 +180,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                         profile_service.append(item_name)
                         profile_value.append(item_value)
 
-                    result_dict['Услуга'] = '; '.join(profile_service)
+                    result_dict['Услуга'] = profile_service
                     result_dict['Цена'] = profile_value
 
                     to_excel(profile=result_dict, url=mod_url)
