@@ -3,7 +3,8 @@ import time
 import json
 import concurrent.futures
 import shutil
-from multiprocessing import cpu_count
+from multiprocessing import cpu_count, freeze_support
+from multiprocessing import Pool
 
 import pandas as pd
 import openpyxl
@@ -38,7 +39,6 @@ options.add_argument(f'--user-agent={ua}')
 options.add_argument('start-maximized')
 options.add_argument('--headless')
 options.add_argument('--enable-javascript')
-options.binary_location = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe'
 
 
 def exec_url(u_folder):
@@ -196,8 +196,9 @@ def get_and_modified_data(url, c_name, doc_folder):
         driver.quit()
 
 
-def concentrate_func(url, doc_folder, c_name):
-    get_and_modified_data(url=url, c_name=c_name, doc_folder=doc_folder)
+def concentrate_func(array):
+    for url, city_name in array.items():
+        concentrate_func(url=url, doc_folder=user_folder, c_name=city_name)
 
 
 def main():
@@ -222,6 +223,8 @@ def main():
 
 if __name__ == '__main__':
     try:
+        __spec__ = None
+        freeze_support()
         main()
         shutil.rmtree(html_folder)
     except KeyboardInterrupt:
