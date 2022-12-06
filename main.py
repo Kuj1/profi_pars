@@ -43,7 +43,7 @@ options.add_argument('--enable-javascript')
 
 def exec_url(u_folder):
     params_url = dict()
-    with open(os.path.join(u_folder, 'user_urls.txt'), 'r') as doc:
+    with open(os.path.join(u_folder, 'user_urls.txt'), 'r', encoding='utf8') as doc:
         for url in doc.readlines():
             params = url.replace('\n', '').strip().split(';')
             params_url[params[0]] = params[1]
@@ -52,7 +52,7 @@ def exec_url(u_folder):
 
 
 def modified_url(link, name, folder):
-    with open(os.path.join(folder, 'city_params.json'), 'r') as doc:
+    with open(os.path.join(folder, 'city_params.json'), 'r', encoding='utf8') as doc:
         params = json.load(doc)
         for param in params:
             if name == param['name']:
