@@ -3,7 +3,7 @@ import time
 import json
 import concurrent.futures
 import shutil
-from multiprocessing import cpu_count, freeze_support
+from multiprocessing import cpu_count
 from multiprocessing import Pool
 
 import pandas as pd
@@ -196,35 +196,17 @@ def get_and_modified_data(url, c_name, doc_folder):
         driver.quit()
 
 
-def concentrate_func(array):
-    for url, city_name in array.items():
-        concentrate_func(url=url, doc_folder=user_folder, c_name=city_name)
+def concentrate_func(url, doc_folder, c_name):
+    get_and_modified_data(url=url, c_name=c_name, doc_folder=doc_folder)
 
 
 def main():
-    workers = cpu_count()
-
-    futures = []
-    length_data = len(exec_url(u_folder=user_folder))
-
-    with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
-        for url, city_name in exec_url(u_folder=user_folder).items():
-            new_future = executor.submit(
-                concentrate_func,
-                url=url,
-                doc_folder=user_folder,
-                c_name=city_name
-            )
-            futures.append(new_future)
-            length_data -= 1
-
-    concurrent.futures.wait(futures)
+    for url, city_name in exec_url(u_folder=user_folder).items():
+        concentrate_func(url=url, doc_folder=user_folder, c_name=city_name)
 
 
 if __name__ == '__main__':
     try:
-        __spec__ = None
-        freeze_support()
         main()
         shutil.rmtree(html_folder)
     except KeyboardInterrupt:
