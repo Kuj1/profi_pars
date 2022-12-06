@@ -33,6 +33,7 @@ ua = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML,
 
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-blink-features=AutomationControlled')
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
 options.add_argument(f'--user-agent={ua}')
 options.add_argument('start-maximized')
 options.add_argument('--headless')
