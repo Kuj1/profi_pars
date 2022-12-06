@@ -43,7 +43,7 @@ options.add_argument('--enable-javascript')
 
 def exec_url(u_folder):
     params_url = dict()
-    with open(os.path.join(u_folder, 'user_urls.txt'), 'r', encoding='utf8') as doc:
+    with open(os.path.join(u_folder, 'user_urls.txt'), 'r') as doc:
         for url in doc.readlines():
             params = url.replace('\n', '').strip().split(';')
             params_url[params[0]] = params[1]
@@ -52,7 +52,7 @@ def exec_url(u_folder):
 
 
 def modified_url(link, name, folder):
-    with open(os.path.join(folder, 'city_params.json'), 'r', encoding='utf8') as doc:
+    with open(os.path.join(folder, 'city_params.json'), 'r') as doc:
         params = json.load(doc)
         for param in params:
             if name == param['name']:
@@ -180,7 +180,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                         profile_service.append(item_name)
                         profile_value.append(item_value)
 
-                    result_dict['Услуга'] = profile_service
+                    result_dict['Услуга'] = '; '.join(profile_service)
                     result_dict['Цена'] = profile_value
 
                     to_excel(profile=result_dict, url=mod_url)
@@ -201,8 +201,27 @@ def concentrate_func(url, doc_folder, c_name):
 
 
 def main():
-    for url, city_name in exec_url(u_folder=user_folder).items():
-        concentrate_func(url=url, doc_folder=user_folder, c_name=city_name)
+    # for url, city_name in exec_url(u_folder=user_folder).items():
+    #     concentrate_func(url=url, doc_folder=user_folder, c_name=city_name)
+
+
+    workers = cpu_count()
+
+    futures = []
+    length_data = len(exec_url(u_folder=user_folder))
+
+    with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
+        for url, city_name in exec_url(u_folder=user_folder).items():
+            new_future = executor.submit(
+                concentrate_func,
+                url=url,
+                doc_folder=user_folder,
+                c_name=city_name
+            )
+            futures.append(new_future)
+            length_data -= 1
+
+    concurrent.futures.wait(futures)
 
 
 if __name__ == '__main__':
