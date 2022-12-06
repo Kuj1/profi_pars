@@ -7,7 +7,7 @@ from multiprocessing import cpu_count
 
 import pandas as pd
 import openpyxl
-import undetected_chromedriver
+# import undetected_chromedriver
 from selenium import webdriver
 from openpyxl.utils.dataframe import dataframe_to_rows
 from selenium.webdriver.chrome.service import Service
@@ -83,7 +83,7 @@ def to_excel(profile, url):
 
 def get_and_modified_data(url, c_name, doc_folder):
     service = Service(f'{os.getcwd()}/chromedriver')
-    driver = undetected_chromedriver.Chrome(service=service, options=options)
+    driver = webdriver.Chrome(service=service, options=options)
     timeout = 3
 
     mod_url = modified_url(link=url, name=c_name, folder=doc_folder)
