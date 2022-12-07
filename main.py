@@ -147,7 +147,7 @@ def get_and_modified_data(url, c_name, doc_folder):
                     file.write(driver.page_source)
 
                 profile_name = profile_soup.find('h1', attrs={'data-shmid': 'profilePrepName'}).text.strip()
-                result_dict['Имя'] = [profile_name]
+                result_dict['Имя'] = profile_name
 
                 profile_edu = profile_soup.find('div', attrs={'data-shmid': 'profileOIO'}).\
                     find_all('div', class_='_1Q9TGk6')
@@ -155,12 +155,14 @@ def get_and_modified_data(url, c_name, doc_folder):
                 person_edu = list()
                 for edu in profile_edu:
                     truly_edu = edu.find('div', class_='ui-text').text.strip()
-                    person_edu.append(truly_edu)
-                result_dict['Образование'] = person_edu
+                    if truly_edu.startswith('На сервисе с'):
+                        person_edu.append('-')
+                    else:
+                        person_edu.append(truly_edu)
+                person_edu_to_str = ';\n'.join(person_edu)
+                result_dict['Образование'] = person_edu_to_str
 
                 profile_service = list()
-                profile_value = list()
-                profile_ext = list()
                 with open(f'{os.path.join(html_folder, f"{c_name}.html")}', 'r') as file:
                     src = file.read()
 
@@ -175,14 +177,13 @@ def get_and_modified_data(url, c_name, doc_folder):
 
                     for price in profile_price:
                         item_name = price.find('td', class_='item_name').find('span').text.strip()
-                        item_value = price.find('td', class_='item_value').text.strip()
+                        # item_value = price.find('td', class_='item_value').text.strip()
 
                         profile_service.append(item_name)
-                        profile_value.append(item_value)
+                    profile_service_str = ';'.join(profile_service)
 
-                    result_dict['Услуга'] = profile_service
-                    result_dict['Цена'] = profile_value
-
+                    result_dict['Услуга'] = profile_service_str
+                    print(result_dict)
                     to_excel(profile=result_dict, url=mod_url)
 
                 profile_count += 1
